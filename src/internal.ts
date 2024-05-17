@@ -110,22 +110,7 @@ export function createInternalSpy<A extends any[], R>(
         throw err
       }
     }
-    let resultTuple: ResultFn<R> = [type, result]
-    if (isPromise(result)) {
-      const newPromise = result
-        .then((r: any) => (resultTuple[1] = r))
-        .catch((e: any) => {
-          // @ts-expect-error TS for some reasons narrows down the type
-          resultTuple[0] = 'error'
-          resultTuple[1] = e
-          throw e
-        })
-      // we need to reassign it because if it fails, the suite will fail
-      // see `async error` test in `test/index.test.ts`
-      Object.assign(newPromise, result)
-      result = newPromise
-    }
-    state.results.push(resultTuple)
+    state.results.push([type, result])
     return result
   } as SpyInternal<A, R>
 
